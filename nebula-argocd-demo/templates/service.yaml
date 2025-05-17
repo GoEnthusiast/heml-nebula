@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nebula-argocd-demo-service
+  namespace: nebula
+  labels:
+    project: nebula
+    nebula: nebula-argocd-demo
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "300"
+    service.beta.kubernetes.io/aws-load-balancer-type: elb
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "project=nebula"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-2:650251696491:certificate/962222ba-11ba-48ae-94ad-a2f378d560ba
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  selector:
+    project: nebula
+    nebula: nebula-argocd-demo
+  ports:
+  - name: http
+    port: 80
+    targetPort: project-http
+  - name: https
+    port: 443
+    targetPort: project-https
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nebula-argocd-demo-jmx-service
+  namespace: nebula
+  labels:
+    project: nebula
+    nebula: nebula-argocd-demo
+spec:
+  type: ClusterIP
+  selector:
+    project: nebula
+    nebula: nebula-argocd-demo
+  ports:
+  - name: project-jmx
+    protocol: TCP
+    port: 8081
+    targetPort: 8081

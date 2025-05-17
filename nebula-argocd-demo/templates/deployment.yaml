@@ -1,0 +1,100 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nebula-argocd-demo-deployment
+  namespace: nebula
+spec:
+  selector:
+    matchLabels:
+      project: nebula
+      nebula: nebula-argocd-demo
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: '/'
+      labels:
+        project: nebula
+        nebula: nebula-argocd-demo
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: nebula-argocd-demo-container
+          image: 650251696491.dkr.ecr.us-east-2.amazonaws.com/nebula-argocd-demo:20250515-0147
+          ports:
+            - containerPort: 8096
+              protocol: TCP
+              name: project-http
+            - containerPort: 8096
+              protocol: TCP
+              name: project-https
+            - containerPort: 8081
+              protocol: TCP
+              name: project-jmx
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: JAVA_OPTS
+              value: >
+                -Dserver.port=8096
+                -Dspring.config.additional-location=classpath:/,file:/config/
+                -Dfile.encoding=UTF-8
+                -Dspring.profiles.active=prod
+                -Xss256k
+                -javaagent:/tmp/jmx_prometheus_javaagent-0.15.0.jar=8081:/tmp/prometheus-jmx-config.yaml
+          volumeMounts:
+            - mountPath: "/data/apps/nebula-argocd-demo/logs"
+              name: nebula-argocd-demo-volume1
+            - mountPath: "/data/logs"
+              name: nebula-argocd-demo-volume2
+            - mountPath: /config/application.yml
+              name: config-volume
+              subPath: application.yml
+            - mountPath: /config/application-prod.yml
+              name: config-volume
+              subPath: application-prod.yml
+            - mountPath: /config/platform-ds/nebula-datasource.properties
+              name: config-volume
+              subPath: nebula-datasource.properties
+          readinessProbe:
+            tcpSocket:
+              port: 8096
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8096
+            initialDelaySeconds: 15
+            periodSeconds: 60
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "0.3"
+              memory: "300Mi"
+            requests:
+              cpu: "0.05"
+              memory: 200Mi
+      volumes:
+        - name: nebula-argocd-demo-volume1
+          hostPath:
+            path: /data/apps/nebula-argocd-demo/logs
+        - name: nebula-argocd-demo-volume2
+          hostPath:
+            path: /data/logs
+        - name: config-volume
+          configMap:
+            name: nebula-api-affiliate-configmap
+            items:
+            - key: application.yml
+              path: application.yml
+            - key: application-prod.yml
+              path: application-prod.yml
+            - key: nebula-datasource.properties
+              path: nebula-datasource.properties
+
