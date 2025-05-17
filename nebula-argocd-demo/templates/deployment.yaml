@@ -77,3 +77,6 @@ spec:
         - name: nebula-argocd-demo-volume2
           hostPath:
             path: /data/logs
+        - name: demo-volume
+          hostPath:
+            path: /data/apps/nebula-argocd-demo
