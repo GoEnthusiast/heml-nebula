@@ -53,15 +53,6 @@ spec:
               name: nebula-argocd-demo-volume1
             - mountPath: "/data/logs"
               name: nebula-argocd-demo-volume2
-            - mountPath: /config/application.yml
-              name: config-volume
-              subPath: application.yml
-            - mountPath: /config/application-prod.yml
-              name: config-volume
-              subPath: application-prod.yml
-            - mountPath: /config/platform-ds/nebula-datasource.properties
-              name: config-volume
-              subPath: nebula-datasource.properties
           readinessProbe:
             tcpSocket:
               port: 8096
@@ -87,14 +78,3 @@ spec:
         - name: nebula-argocd-demo-volume2
           hostPath:
             path: /data/logs
-        - name: config-volume
-          configMap:
-            name: nebula-api-affiliate-configmap
-            items:
-            - key: application.yml
-              path: application.yml
-            - key: application-prod.yml
-              path: application-prod.yml
-            - key: nebula-datasource.properties
-              path: nebula-datasource.properties
-
