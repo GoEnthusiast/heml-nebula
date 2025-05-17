@@ -43,7 +43,6 @@ spec:
             - name: JAVA_OPTS
               value: >
                 -Dserver.port=8096
-                -Dspring.config.additional-location=classpath:/,file:/config/
                 -Dfile.encoding=UTF-8
                 -Dspring.profiles.active=prod
                 -Xss256k
