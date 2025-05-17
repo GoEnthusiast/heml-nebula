@@ -1,4 +1,4 @@
-replicaCount: 0
+replicaCount: 1
 
 image:
   repository: 650251696491.dkr.ecr.us-east-2.amazonaws.com/nebula-argocd-demo
