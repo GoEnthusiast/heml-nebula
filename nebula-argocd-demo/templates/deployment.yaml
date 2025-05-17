@@ -9,7 +9,7 @@ spec:
     matchLabels:
       project: nebula
       nebula: nebula-argocd-demo
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       annotations:
@@ -23,7 +23,8 @@ spec:
       restartPolicy: Always
       containers:
         - name: nebula-argocd-demo-container
-          image: 650251696491.dkr.ecr.us-east-2.amazonaws.com/nebula-argocd-demo:20250515-0147
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8096
               protocol: TCP
@@ -62,14 +63,13 @@ spec:
               port: 8096
             initialDelaySeconds: 15
             periodSeconds: 60
-          imagePullPolicy: Always
           resources:
             limits:
-              cpu: "0.3"
-              memory: "300Mi"
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
             requests:
-              cpu: "0.05"
-              memory: 200Mi
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: {{ .Values.resources.requests.memory }}
       volumes:
         - name: nebula-argocd-demo-volume1
           hostPath:

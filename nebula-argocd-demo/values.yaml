@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: 650251696491.dkr.ecr.us-east-2.amazonaws.com/nebula-argocd-demo
+  tag: 20250515-0147
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: "0.3"
+    memory: "300Mi"
+  requests:
+    cpu: "0.05"
+    memory: 200Mi
